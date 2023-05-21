@@ -15,7 +15,7 @@ const dotenv = require('dotenv')
 dotenv.config()
 
 app.get('/',(req, res)=>{
-    res.send('sdsd')
+    res.send('please authenticate')
 })
 
 
