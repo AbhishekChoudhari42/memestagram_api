@@ -197,11 +197,55 @@ router.get("/getcomments/:postId",verify,asyncError(async (req,res)=>{
     await dbconn();
     
     let comments = await Comment.find({
-        userId : userId.userId,
         postId : postId,
     }).sort({ 'createdAt': -1 })
 
     res.status(200).json({success:true,comments})
+
+}))
+
+
+
+router.put("/likecomment/:status",verify,asyncError(async (req,res)=>{
+
+    await dbconn();
+
+    let userId = req.userId
+    let user = await User.findById({_id:userId.userId})
+
+    let commentId = req.body.commentId
+    let comment  = await Comment.findById(commentId)
+    
+    let status = req.params.status
+
+    let responseArray;
+
+    if(status === 'like'){
+        
+        await Comment.findByIdAndUpdate(commentId,{
+            $push:{likes : `${user._id}`}
+        })
+        
+        let updatedComment = await Comment.findById(commentId)
+        responseArray = updatedComment.likes
+
+    }else if(status === 'unlike'){
+
+        const updatedLikesArray = comment.likes.filter(element=>{return element != `${user._id}`})
+        console.log(updatedLikesArray)
+        await Comment.findByIdAndUpdate(commentId,{
+            likes : updatedLikesArray
+        })
+
+        responseArray = updatedLikesArray
+
+    }
+    let action = false
+    if(status == 'like'){
+        action = true
+    }
+
+    res.status(200).json({status : action,likes:responseArray.length})
 
 }))
 
