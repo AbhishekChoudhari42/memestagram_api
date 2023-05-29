@@ -1,1 +1,1 @@
-﻿# memestagram_api
+This is an API for the Memestagram project
